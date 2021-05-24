@@ -12,9 +12,9 @@ object HdfsTest {
 
   def main(args: Array[String]) {
     // 设置Hadoop 用户名
-    System.setProperty("HADOOP_USER_NAME", "root")
+    System.setProperty("HADOOP_USER_NAME", "Administrator")
 
-    val uri = "hdfs://master:9000"
+    val uri = "hdfs://localhost:9000"
     val config = new Configuration()
     val fs = FileSystem.get(URI.create(uri), config)
 
@@ -26,7 +26,7 @@ object HdfsTest {
 
     status.foreach(println)
 
-    val localIS = new FileInputStream("f:/spark/README.md")
+    val localIS = new FileInputStream("e:/spark/README.md")
 
     val os = fs.create(new Path("/user/fkong/README.md"))
     IOUtils.copyBytes(localIS, os, 1024, true)
