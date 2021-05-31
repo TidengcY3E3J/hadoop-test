@@ -2,8 +2,9 @@ import java.io.FileInputStream
 import java.net.URI
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FSDataOutputStream, FileSystem, Path}
+import org.apache.hadoop.fs.{FSDataOutputStream, FileSystem, Path, PathFilter}
 import org.apache.hadoop.io.IOUtils
+import org.apache.hadoop.util.Progressable
 
 /**
   * Created by Administrator on 2016/9/8 0008.
@@ -28,11 +29,22 @@ object HdfsTest {
 
     val localIS = new FileInputStream("e:/spark/README.md")
 
-    val os = fs.create(new Path("/user/fkong/README.md"))
-    IOUtils.copyBytes(localIS, os, 1024, true)
+    val os = fs.create(new Path("/user/fkong/README.md"), new Progressable {
+      override def progress(): Unit = println(".")
+    })
+    IOUtils.copyBytes(localIS, os, 1024, false)
+    os.hflush()
 
-    val is = fs.open(new Path("/user/fkong/README.md"))
-    IOUtils.copyBytes(is, System.out, 1024, true)
+    assert(fs.getFileStatus(new Path("/user/fkong/README.md")).getLen != 0)
+
+    fs.globStatus(new Path("/user/*"), new PathFilter {
+      override def accept(path: Path): Boolean = {
+        !path.toString.matches("^.*/user/fkong$")
+      }
+    }).foreach(println)
+
+//    val is = fs.open(new Path("/user/fkong/README.md"))
+//    IOUtils.copyBytes(is, System.out, 1024, true)
   }
 
 }
