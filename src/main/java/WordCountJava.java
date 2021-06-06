@@ -54,21 +54,21 @@ public class WordCountJava {
             System.exit(-1);
         }
 
-        System.setProperty("HADOOP_USER_NAME", "Administrator");
+        System.setProperty("HADOOP_USER_NAME", "root");
 
         JobConf conf = new JobConf();
         //设置jar
         conf.setJar("./target/hadoop-test-1.0-SNAPSHOT.jar");
-        conf.set("fs.defaultFS", "hdfs://localhost:9000/");
+        conf.set("fs.defaultFS", "hdfs://master:9000/");
         conf.set("hadoop.job.user","joe");
         //指定jobtracker的ip和端口号，master在/etc/hosts中可以配置
-        conf.set("mapreduce.framework.name", "local");
-        conf.set("mapreduce.jobtracker.address", "localhost:9001");
-        conf.set("yarn.resourcemanager.hostname", "localhost");
-        conf.set("yarn.resourcemanager.admin.address", "localhost:8033");
-        conf.set("yarn.resourcemanager.address", "localhost:8032");
-        conf.set("yarn.resourcemanager.resource-tracker.address", "localhost:8035");
-        conf.set("yarn.resourcemanager.scheduler.address", "localhost:8030");
+        conf.set("mapreduce.framework.name", "yarn");
+        conf.set("mapreduce.jobtracker.address", "master:9001");
+        conf.set("yarn.resourcemanager.hostname", "master");
+        conf.set("yarn.resourcemanager.admin.address", "master:8033");
+        conf.set("yarn.resourcemanager.address", "master:8032");
+        conf.set("yarn.resourcemanager.resource-tracker.address", "master:8035");
+        conf.set("yarn.resourcemanager.scheduler.address", "master:8030");
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
         if (otherArgs.length < 2) {
@@ -76,7 +76,7 @@ public class WordCountJava {
             System.exit(2);
         }
 
-        FileSystem fs = FileSystem.get(URI.create("hdfs://localhost:9000"), conf);
+        FileSystem fs = FileSystem.get(URI.create("hdfs://master:9000"), conf);
 
         if (fs.exists(new Path("/user/fkong/output"))) {
             fs.delete(new Path("/user/fkong/output"), true);
