@@ -3,6 +3,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -70,6 +71,7 @@ public class WordCountJava {
         conf.set("yarn.resourcemanager.resource-tracker.address", "master:8035");
         conf.set("yarn.resourcemanager.scheduler.address", "master:8030");
 
+
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
         if (otherArgs.length < 2) {
             System.err.println("Usage: wordcount <in> [<in>...] <out>");
@@ -94,6 +96,11 @@ public class WordCountJava {
         }
         FileOutputFormat.setOutputPath(job,
                 new Path(otherArgs[otherArgs.length - 1]));
+
+        // 压缩属性配置
+        FileOutputFormat.setCompressOutput(job, true);
+        FileOutputFormat.setOutputCompressorClass(job, GzipCodec.class);
+
         System.exit(job.waitForCompletion(true) ? 0 : 1);
 
     }

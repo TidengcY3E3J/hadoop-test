@@ -2,9 +2,10 @@ import java.io.FileInputStream
 import java.net.URI
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FSDataOutputStream, FileSystem, Path, PathFilter}
+import org.apache.hadoop.fs._
 import org.apache.hadoop.io.IOUtils
-import org.apache.hadoop.util.Progressable
+import org.apache.hadoop.io.compress.CompressionCodec
+import org.apache.hadoop.util.{Progressable, ReflectionUtils}
 
 /**
   * Created by Administrator on 2016/9/8 0008.
@@ -13,9 +14,9 @@ object HdfsTest {
 
   def main(args: Array[String]) {
     // 设置Hadoop 用户名
-    System.setProperty("HADOOP_USER_NAME", "Administrator")
+    System.setProperty("HADOOP_USER_NAME", "root")
 
-    val uri = "hdfs://localhost:9000"
+    val uri = "hdfs://master:9000"
     val config = new Configuration()
     val fs = FileSystem.get(URI.create(uri), config)
 
@@ -27,7 +28,17 @@ object HdfsTest {
 
     status.foreach(println)
 
-    val localIS = new FileInputStream("e:/spark/README.md")
+
+    val jdkInputStream = fs.open(new Path("/user/fkong/jdk-7u79-linux-x64.tar.gz"))
+    val jdkOutputStream = fs.create(new Path("/user/fkong/jdk.gz"))
+    val  codecClassname = "org.apache.hadoop.io.compress.GzipCodec"
+    val codecClass = Class.forName(codecClassname)
+    val codec = ReflectionUtils.newInstance(codecClass, config).asInstanceOf[CompressionCodec]
+    val compressionOutputStream = codec.createOutputStream(jdkOutputStream)
+    IOUtils.copyBytes(jdkInputStream, compressionOutputStream, 4096, true)
+
+
+    val localIS = new FileInputStream("f:/spark/README.md")
 
     val os = fs.create(new Path("/user/fkong/README.md"), new Progressable {
       override def progress(): Unit = println(".")
