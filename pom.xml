@@ -14,7 +14,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <scala.version>2.11.8</scala.version>
     <hadoop.version>2.6.4</hadoop.version>
-    <avro.version>1.7.4</avro.version>
+    <avro.version>1.8.1</avro.version>
   </properties>
 
   <build>
@@ -68,6 +68,7 @@
             <configuration>
               <includes>
                 <include>StringPair.avsc</include>
+                <include>User.avsc</include>
               </includes>
               <sourceDirectory>src/main/resources</sourceDirectory>
               <outputDirectory>src/main/java/</outputDirectory>
@@ -115,6 +116,18 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client</artifactId>
       <version>${hadoop.version}</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.avro/avro-mapred -->
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro-mapred</artifactId>
+      <version>${avro.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro-tools</artifactId>
+      <version>${avro.version}</version>
     </dependency>
 
     <dependency>
